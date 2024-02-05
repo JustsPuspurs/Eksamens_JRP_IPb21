@@ -12,15 +12,14 @@ if ($conn->connect_error) {
 
 $entries = '';
 
-// Pārbaude, vai GET parametri ir norādīti
 if (isset($_GET['sort'])) {
     $sort = $_GET['sort'];
     
     // Meklēšanas nosacījums
     $search = '';
-    if (isset($_GET['search'])) {
-        $searchTerm = $conn->real_escape_string($_GET['search']);
-        $search = "WHERE name LIKE '%$searchTerm%'";
+    if (isset($_GET['search']) && trim($_GET['search']) !== '') {
+        $searchTerm = $conn->real_escape_string(trim($_GET['search']));
+        $search = "WHERE LOWER(name) LIKE LOWER('%$searchTerm%')";
     }
 
     // SQL vaicājums ar kārtošanas nosacījumu
@@ -28,6 +27,8 @@ if (isset($_GET['sort'])) {
 } else {
     $sql = "SELECT * FROM entries ORDER BY timestamp DESC";
 }
+
+
 
 $result = $conn->query($sql);
 
