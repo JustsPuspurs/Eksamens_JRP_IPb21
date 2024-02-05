@@ -1,54 +1,39 @@
-<!DOCTYPE html>
-<html lang="lv">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Viesu grāmata</title>
-    <link rel="stylesheet" href="style.css">
-    <script>
-        function validateForm() {
-            var name = document.forms["guestbookForm"]["name"].value;
-            var email = document.forms["guestbookForm"]["email"].value;
-            var message = document.forms["guestbookForm"]["message"].value;
+<?php
+include 'Guestbook.php';
 
-            // Basic validation: Check if name, email, and message are not empty
-            if (name === "" || email === "" || message === "") {
-                alert("Lūdzu, aizpildiet visus obligātos laukus.");
-                return false;
-            }
-        }
-    </script>
-</head>
-<body>
+$host = "localhost";
+$username = "root"; // Default username for XAMPP
+$password = ""; // Default password for XAMPP is empty
+$database = "guestbook";
 
-        <h1>Viesu grāmata</h1>
+$guestbook = new Guestbook($host, $username, $password, $database);
 
-        <!-- Sorting Links -->
+// Sorting Links
+echo '<div>
+        <a href="index.php?sort=name">Kārtot pēc vārda</a> | 
+        <a href="index.php?sort=timestamp">Kārtot pēc pievienošanas datuma</a>
+      </div>';
 
-            <a href="getEntries.php?sort=name">Kārtot pēc vārda</a> | 
-            <a href="getEntries.php?sort=timestamp">Kārtot pēc pievienošanas datuma</a> | 
+// Search Form
+echo '<form method="get" action="index.php">
+        <label for="search">Meklēt pēc vārda:</label>
+        <input type="text" name="search">
+        <button type="submit">Meklēt</button>
+      </form>';
 
+// Guestbook Entry Form
+echo '<form method="post" action="process.php" onsubmit="return validateForm()">
+        <label for="name">Vārds:</label>
+        <input type="text" name="name">
+        <label for="email">E-pasts:</label>
+        <input type="email" name="email">
+        <label for="message">Ziņojums:</label>
+        <textarea name="message"></textarea>
+        <button type="submit">Pievienot ierakstu</button>
+      </form>';
 
-        <form method="get" action="getEntries.php">
-            <label for="search">Meklēt pēc vārda:</label>
-            <input type="text" name="search">
-            <button type="submit">Meklēt</button>
-        </form>
-        <form name="guestbookForm" method="post" action="process.php" onsubmit="return validateForm()">
-            <label for="name">Vārds:</label>
-            <input type="text" name="name">
-            
-            <label for="email">E-pasts:</label>
-            <input type="email" name="email">
-            
-            <label for="message">Ziņojums:</label>
-            <textarea name="message"></textarea>
+// Display Guestbook Entries
+echo '<div id="guestBookEntries">' . $guestbook->getEntries($_GET['sort'] ?? 'timestamp', $_GET['search'] ?? '') . '</div>';
 
-            <button type="submit">Pievienot ierakstu</button>
-        </form>
-        
-        <div id="guestBookEntries">
-            <?php include 'getEntries.php'; ?>
-
-</body>
-</html>
+$guestbook->closeConnection();
+?>
